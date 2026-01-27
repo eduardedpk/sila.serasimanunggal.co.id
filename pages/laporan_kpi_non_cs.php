@@ -240,6 +240,24 @@ else
                                             <li>
                                                 <a href="index.php" class="waves-effect"><i class="ti-home"></i><span> Dashboard </span></a>
                                             </li>
+                                            <?php
+                                            $sql="SELECT dk.KaryawanNID, dk.Status_Kepala_Divisi FROM data_karyawan dk
+                                                    WHERE NIM='".$Last_User."'
+                                                    LIMIT 1";
+                                            $qry=mysqli_query($Connection, $sql);
+                                            $buff=mysqli_fetch_array($qry);
+                                            $KaryawanNID=$buff['KaryawanNID'];
+                                            $_SESSION['KaryawanNID']=$KaryawanNID;
+                                            $Status_Kepala_Divisi=$buff['Status_Kepala_Divisi'];
+                                            if($Status_Kepala_Divisi==1)
+                                            {
+                                                ?>
+                                                <li>
+                                                    <a href="laporan_kpi_non_cs.php?Action=Approval_List" class="waves-effect"><i class="fa fa-check-square-o"></i><span> Approval Laporan </span></a>
+                                                </li>
+                                                <?php
+                                            }
+                                            ?>
                                             <li>
                                                 <a href="index.php" class="waves-effect"><i class="ti-back-left"></i><span> Kembali </span></a>
                                             </li>
@@ -691,6 +709,693 @@ else
             </html>
             <?php
         }
+        elseif($_GET['Action']=='Approval_List')
+        {
+
+            ?>
+            <!DOCTYPE html>
+            <html>
+                <head>
+                    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+                    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimal-ui">
+                    <title>SILA - SMS</title>
+                    <meta content="Admin Dashboard" name="description" />
+                    <meta content="ThemeDesign" name="author" />
+                    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+
+                    <link rel="apple-touch-icon" sizes="57x57" href="assets/images/favicon/apple-icon-57x57.png">
+                    <link rel="apple-touch-icon" sizes="60x60" href="assets/images/favicon/apple-icon-60x60.png">
+                    <link rel="apple-touch-icon" sizes="72x72" href="assets/images/favicon/apple-icon-72x72.png">
+                    <link rel="apple-touch-icon" sizes="76x76" href="assets/images/favicon/apple-icon-76x76.png">
+                    <link rel="apple-touch-icon" sizes="114x114" href="assets/images/favicon/apple-icon-114x114.png">
+                    <link rel="apple-touch-icon" sizes="120x120" href="assets/images/favicon/apple-icon-120x120.png">
+                    <link rel="apple-touch-icon" sizes="144x144" href="assets/images/favicon/apple-icon-144x144.png">
+                    <link rel="apple-touch-icon" sizes="152x152" href="assets/images/favicon/apple-icon-152x152.png">
+                    <link rel="apple-touch-icon" sizes="180x180" href="assets/images/favicon/apple-icon-180x180.png">
+                    <link rel="icon" type="image/png" sizes="192x192"  href="assets/images/favicon/android-icon-192x192.png">
+                    <link rel="icon" type="image/png" sizes="32x32" href="assets/images/favicon/favicon-32x32.png">
+                    <link rel="icon" type="image/png" sizes="96x96" href="assets/images/favicon/favicon-96x96.png">
+                    <link rel="icon" type="image/png" sizes="16x16" href="assets/images/favicon/favicon-16x16.png">
+                    <link rel="manifest" href="assets/images/favicon/manifest.json">
+                    <meta name="msapplication-TileColor" content="#ffffff">
+                    <meta name="msapplication-TileImage" content="assets/images/favicon/ms-icon-144x144.png">
+                    <meta name="theme-color" content="#ffffff">
+
+                    <!-- DataTables -->
+                    
+                    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/dt/dt-1.10.24/datatables.min.css"/>
+                    <link href="assets/plugins/bootstrap-datepicker/css/bootstrap-datepicker.min.css" rel="stylesheet">
+
+                    <link href="assets/css/bootstrap.min.css" rel="stylesheet" type="text/css">
+                    <link href="assets/css/icons.css" rel="stylesheet" type="text/css">
+                    <link href="assets/css/style.css" rel="stylesheet" type="text/css">
+
+                </head>
+
+
+                <body class="fixed-left">
+
+                    <!-- Begin page -->
+                    <div id="wrapper">
+
+                        <!-- Top Bar Start -->
+                        <div class="topbar">
+                            <!-- LOGO -->
+                            <div class="topbar-left">
+                                <a href="index.php" class="logo">SILA</a>
+                                <a href="index.php" class="logo-sm"><span>S</span></a>
+                                <!--<a href="index.html" class="logo"><img src="assets/images/logo.png" height="20" alt="logo"></a>
+                                <a href="index.html" class="logo-sm"><img src="assets/images/logo_sm.png" height="30" alt="logo"></a>-->
+                            </div>
+                            <!-- Button mobile view to collapse sidebar menu -->
+                            <div class="navbar navbar-default" role="navigation">
+                                <div class="container">
+                                    <div class="">
+                                        <div class="pull-left">
+                                            <button type="button" class="button-menu-mobile open-left waves-effect waves-light">
+                                                <i class="ion-navicon"></i>
+                                            </button>
+                                            <span class="clearfix"></span>
+                                        </div>
+                                        <ul class="nav navbar-nav navbar-right pull-right">
+                                            
+                                            <li class="hidden-xs">
+                                                <a href="#" id="btn-fullscreen" class="waves-effect waves-light notification-icon-box"><i class="ion-qr-scanner"></i></a>
+                                            </li>
+                                            <li class="dropdown">
+                                                <a href="" class="dropdown-toggle profile waves-effect waves-light" data-toggle="dropdown" aria-expanded="true">
+                                                    <img src="../files/profile_pictures/<?php echo $Profile_Pictures ?>" alt="user-img" class="img-circle">
+                                                    <span class="profile-username">
+                                                        <?php echo $Nama_Panggilan ?> <span class="caret"></span>
+                                                    </span>
+                                                </a>
+                                                <ul class="dropdown-menu">
+                                                    <!--<li><a href="<?php echo $Link_Profile ?>"> Profile</a></li>-->
+                                                    <li><a href="../logout.php"> Logout</a></li>
+                                                </ul>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                    <!--/.nav-collapse -->
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Top Bar End -->
+
+
+                        <!-- ========== Left Sidebar Start ========== -->
+
+                        <div class="left side-menu">
+                            <div class="sidebar-inner slimscrollleft">
+
+                                <form class="sidebar-search">
+                                    <div class="">
+                                        <input type="text" class="form-control search-bar" placeholder="Search...">
+                                    </div>
+                                    <button type="submit" class="btn btn-search"><i class="fa fa-search"></i></button>
+                                </form>
+
+                                <div class="user-details">
+                                    <div class="text-center">
+                                        <img src="../files/profile_pictures/<?php echo $Profile_Pictures ?>" alt="" class="img-circle">
+                                    </div>
+                                    <div class="user-info">
+                                        <div class="dropdown">
+                                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" aria-expanded="false"><?php echo $Nama_Panggilan ?> <span class="caret"></span></a>
+                                            <ul class="dropdown-menu">
+                                                <!--<li><a href="<?php echo $Link_Profile ?>"> Profile</a></li>-->
+                                                <li><a href="../logout.php"> Logout</a></li>
+                                            </ul>
+                                        </div>
+
+                                        <!--<p class="text-muted m-0"><i class="fa fa-dot-circle-o text-success"></i> Online</p>-->
+                                    </div>
+                                </div>
+                                <!--- Divider -->
+
+
+                                <div id="sidebar-menu">
+                                    <?php
+                                    //$Hak_Akses = 3;
+                                    if($Hak_Akses==1) //Administrator
+                                    {
+                                        ?>
+                                        <ul>
+                                            <li>
+                                                <a href="index.php" class="waves-effect"><i class="ti-home"></i><span> Dashboard </span></a>
+                                            </li>
+                                            <li>
+                                                <a href="inventori_transaksi.php?Action=Daftar" class="waves-effect"><i class="fa fa-handshake-o"></i><span> Transaksi </span></a>
+                                            </li>
+                                            <li>
+                                                <a href="inventori_kategori.php?Action=Daftar" class="waves-effect"><i class="fa fa-tv"></i><span> Kategori </span></a>
+                                            </li>
+                                            <li>
+                                                <a href="index.php" class="waves-effect"><i class="ti-back-left"></i><span> Kembali </span></a>
+                                            </li>
+                                        </ul>
+                                        <?php
+                                    }
+                                    elseif($Hak_Akses==2) //Kepala Sekolah
+                                    {
+                                        ?>
+                                        <ul>
+                                            <li>
+                                                <a href="index.php" class="waves-effect"><i class="ti-home"></i><span> Dashboard </span></a>
+                                            </li>
+                                            <li>
+                                                <a href="index.php" class="waves-effect"><i class="ti-back-left"></i><span> Kembali </span></a>
+                                            </li>
+                                        </ul>
+                                        <?php
+                                    }
+                                    elseif($Hak_Akses==3) //Guru
+                                    {
+                                        ?>
+                                        <ul>
+                                            <li>
+                                                <a href="index.php" class="waves-effect"><i class="ti-home"></i><span> Dashboard </span></a>
+                                            </li>
+                                            <li>
+                                                <a href="index.php" class="waves-effect"><i class="ti-back-left"></i><span> Kembali </span></a>
+                                            </li>
+                                        </ul>
+                                        <?php
+                                    }
+                                    elseif($Hak_Akses==4) //Guru
+                                    {
+                                        ?>
+                                        <ul>
+                                            <li>
+                                                <a href="index.php" class="waves-effect"><i class="ti-home"></i><span> Dashboard </span></a>
+                                            </li>
+                                            <li>
+                                                <a href="laporan_kpi_non_cs.php?Action=Daftar" class="waves-effect"><i class="ti-back-left"></i><span> Kembali </span></a>
+                                            </li>
+                                        </ul>
+                                        <?php
+                                    }
+                                    elseif($Hak_Akses==5) //Guru
+                                    {
+                                        ?>
+                                        <ul>
+                                            <li>
+                                                <a href="index.php" class="waves-effect"><i class="ti-home"></i><span> Dashboard </span></a>
+                                            </li>
+                                            <li>
+                                                <a href="index.php" class="waves-effect"><i class="ti-back-left"></i><span> Kembali </span></a>
+                                            </li>
+                                        </ul>
+                                        <?php
+                                    }
+                                    ?>
+                                </div>
+                                <div class="clearfix"></div>
+                            </div> <!-- end sidebarinner -->
+                        </div>
+                        <!-- Left Sidebar End -->
+
+                        <!-- Start right Content here -->
+
+                        <div class="content-page">
+                            <!-- Start content -->
+                            <div class="content">
+                                <?php
+                                //cari nama cabang
+                                ?>    
+                                <div class="">
+                                    <div class="page-header-title">
+                                        <h4 class="page-title">Daftar Approval Laporan KPI Non CS</h4>
+                                    </div>
+                                </div>
+                                <?php
+                                // Filter Tahun
+                                if(isset($_GET['Tahun']))
+                                {
+                                    $Filter_Tahun = $_GET['Tahun'];
+                                    $_SESSION['Filter_Tahun'] = $Filter_Tahun;
+                                }
+                                else
+                                {   
+                                    if(!isset($_SESSION['Filter_Tahun']))
+                                    {
+                                        $_SESSION['Filter_Tahun'] = date('Y');
+                                        $Filter_Tahun = $_SESSION['Filter_Tahun'];
+                                    }
+                                    else
+                                    {
+                                        $Filter_Tahun = $_SESSION['Filter_Tahun'];
+                                    }
+                                }
+
+                                // Filter Bulan
+                                if(isset($_GET['Bulan']))
+                                {
+                                    $Filter_Bulan = $_GET['Bulan'];
+                                    $_SESSION['Filter_Bulan'] = $Filter_Bulan;
+                                }
+                                else
+                                {   
+                                    if(!isset($_SESSION['Filter_Bulan']))
+                                    {
+                                        $_SESSION['Filter_Bulan'] = date('m');
+                                        $Filter_Bulan = $_SESSION['Filter_Bulan'];
+                                    }
+                                    else
+                                    {
+                                        $Filter_Bulan = $_SESSION['Filter_Bulan'];
+                                    }
+                                }
+
+                                // Periode Laporan dari Tahun dan Bulan
+                                $Periode_Laporan = $Filter_Tahun . '-' . str_pad($Filter_Bulan, 2, '0', STR_PAD_LEFT);
+
+                                if(isset($_GET['Cabang']))
+                                {
+                                    $Filter_Cabang = $_GET['Cabang'];
+                                    $_SESSION['Filter_Cabang'] = $Filter_Cabang;
+                                }
+                                else
+                                {   
+
+                                    if(!isset($_SESSION['Filter_Cabang']))
+                                    {
+                                        $_SESSION['Filter_Cabang'] = 1;
+                                        $Filter_Cabang = $_SESSION['Filter_Cabang'];
+                                    }
+                                    else
+                                    {
+                                        $Filter_Cabang = $_SESSION['Filter_Cabang'];
+                                    }
+                                    //echo "Cabang : ".$Filter_Cabang."<br>";
+                                    
+                                }
+                                ?>
+                                <div class="page-content-wrapper ">
+
+                                    <div class="container">
+                                        <div>
+                                            <a href="#demo" class="" data-toggle="collapse">Filter</a>
+                                            
+                                        </div>
+                                        <div id="demo" class="collapse" style="margin-bottom: 15px; margin-top: 10px;">
+                                            <div class="row">
+                                                <div class="col-md-4">
+                                                    <label>Tahun:</label>
+                                                    <select id="inputTahun" class="form-control" onchange="ApplyFilter()">
+                                                        <?php
+                                                        // Get distinct years from Tanggal_Laporan
+                                                        $sql_tahun = "SELECT DISTINCT YEAR(Tanggal_Laporan) AS Tahun FROM laporan_non_cs ORDER BY Tahun DESC";
+                                                        $qry_tahun = mysqli_query($Connection, $sql_tahun);
+                                                        
+                                                        $tahun_list = array();
+                                                        while($buff_tahun = mysqli_fetch_array($qry_tahun))
+                                                        {
+                                                            $tahun_list[] = $buff_tahun['Tahun'];
+                                                        }
+                                                        
+                                                        // Add current year if not in list
+                                                        $current_year = date('Y');
+                                                        if(!in_array($current_year, $tahun_list))
+                                                        {
+                                                            $tahun_list[] = $current_year;
+                                                            rsort($tahun_list);
+                                                        }
+                                                        
+                                                        foreach($tahun_list as $tahun)
+                                                        {
+                                                            $selected = ($tahun == $Filter_Tahun) ? 'selected' : '';
+                                                            echo '<option value="'.$tahun.'" '.$selected.'>'.$tahun.'</option>';
+                                                        }
+                                                        ?>
+                                                    </select>
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <label>Bulan:</label>
+                                                    <select id="inputBulan" class="form-control" onchange="ApplyFilter()">
+                                                        <?php
+                                                        for($i = 1; $i <= 12; $i++)
+                                                        {
+                                                            $bulan_val = str_pad($i, 2, '0', STR_PAD_LEFT);
+                                                            $selected = ($bulan_val == $Filter_Bulan) ? 'selected' : '';
+                                                            echo '<option value="'.$bulan_val.'" '.$selected.'>'.$Daftar_Bulan[$i].'</option>';
+                                                        }
+                                                        ?>
+                                                    </select>
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <label>&nbsp;</label><br>
+                                                    <button type="button" class="btn btn-primary" onclick="ApplyFilter()"><i class="fa fa-filter"></i> Terapkan Filter</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="panel">
+                                            <div class="panel-body table-responsive">
+                                                
+                                                <!--<h4 class="m-b-30 m-t-0">Fixed Header Example</h4>-->
+                                                <table id="data-kehadiran" class="display" style="width:100%">
+                                                    <thead>
+                                                        <tr>
+                                                            <th width=5% rowspan=1 style="text-align:center;vertical-align:middle">No</th>
+                                                        
+                                                            <th width=15% rowspan=1 style="text-align:left;vertical-align:middle">User</th>
+                                                            <th width=25% rowspan=1 style="text-align:left;vertical-align:middle">Indikator</th>
+                                                            <th width=5% rowspan=1 style="text-align:left;vertical-align:middle">Periode</th>
+                                                            <th width=10% rowspan=1 style="text-align:left;vertical-align:middle">Lokasi</th>
+                                                            <th width=15% rowspan=1 style="text-align:left;vertical-align:middle">Tanggal</th>
+                                                            <th width=15% rowspan=1 style="text-align:center;vertical-align:middle">File</th>
+                                                            <th width=5% rowspan=1 style="text-align:center;vertical-align:middle">Status</th>
+                                                            <th width=5% colspan=1 style="text-align:left;vertical-align:middle">Action</th>
+                                                            
+                                                            
+                                                            
+                                                        </tr>
+                                                    </thead>
+
+
+                                                    <tbody>
+                                                        <?php
+                                                        $Nomor_Urut = 1;
+                                                        
+                                                        $sql = "SELECT ln.*, dk.Nama_Lengkap, ik.Indikator, iu.Jenis, iu.Indikator_UserNID FROM laporan_non_cs ln 
+                                                                    INNER JOIN indikator_kpi_user iu ON iu.Indikator_UserNID = ln.Indikator_UserNID
+                                                                    INNER JOIN indikator_kpi ik ON ik.IndikatorNID = iu.IndikatorNID
+                                                                    INNER JOIN data_karyawan dk ON dk.KaryawanNID = iu.KaryawanNID
+                                                                    INNER JOIN user_list ul ON ul.Username = dk.NIM
+                                                                    WHERE YEAR(ln.Tanggal_Laporan) = '".$Filter_Tahun."' 
+                                                                    AND MONTH(ln.Tanggal_Laporan) = '".$Filter_Bulan."' 
+                                                                    AND dk.Kepala_Divisi = '".$_SESSION['KaryawanNID']."'
+                                                                    ORDER BY ln.Tanggal_Laporan DESC";
+                                                        
+                                                        //echo $sql.";<br>";
+                                                        $qry_Data_Siswa = mysqli_query($Connection, $sql);
+                                                        while($buff_Data_Siswa = mysqli_fetch_array($qry_Data_Siswa))
+                                                        {
+                                                            $LaporanNID = $buff_Data_Siswa['LaporanNID'];
+                                                            $Tanggal_Laporan = $buff_Data_Siswa['Tanggal_Laporan'];
+                                                            $Lokasi = $buff_Data_Siswa['Lokasi'];
+                                                            $Periode = $buff_Data_Siswa['Periode'];
+                                                            $Nama_Lengkap_User = $buff_Data_Siswa['Nama_Lengkap'];
+                                                            $Indikator = $buff_Data_Siswa['Indikator'];
+                                                            $Checked = $buff_Data_Siswa['Checked'];
+                                                            $Jenis = $buff_Data_Siswa['Jenis'];
+                                                            $Indikator_UserNID = $buff_Data_Siswa['Indikator_UserNID'];
+                                                            $Tanggal_Report_Tampilan = strtotime($Tanggal_Laporan);
+                                                            $Hari = date("w", $Tanggal_Report_Tampilan );
+
+                                                            // Get files for this report
+                                                            $sql_files = "SELECT * FROM laporan_kpi_files WHERE LaporanNID = '".$LaporanNID."'";
+                                                            $qry_files = mysqli_query($Connection, $sql_files);
+                                                            $files_html = '';
+                                                            while($buff_files = mysqli_fetch_array($qry_files))
+                                                            {
+                                                                $File_Name = $buff_files['File_Name'];
+                                                                $File_Periode = $Periode;
+                                                                $File_Folder = str_replace('-', '', $File_Periode);
+                                                                $File_Path = "../files/laporan_kpi/".$File_Folder."/".$File_Name;
+                                                                
+                                                                // Get file extension
+                                                                $file_ext = strtolower(pathinfo($File_Name, PATHINFO_EXTENSION));
+                                                                
+                                                                // Set icon based on file type
+                                                                $icon_class = '';
+                                                                $icon_color = '';
+                                                                if(in_array($file_ext, ['jpg', 'jpeg', 'png', 'gif', 'bmp']))
+                                                                {
+                                                                    $icon_class = 'fa fa-file-image-o';
+                                                                    $icon_color = 'color: #4CAF50;';
+                                                                }
+                                                                elseif($file_ext == 'pdf')
+                                                                {
+                                                                    $icon_class = 'fa fa-file-pdf-o';
+                                                                    $icon_color = 'color: #F44336;';
+                                                                }
+                                                                elseif(in_array($file_ext, ['doc', 'docx']))
+                                                                {
+                                                                    $icon_class = 'fa fa-file-word-o';
+                                                                    $icon_color = 'color: #2196F3;';
+                                                                }
+                                                                elseif(in_array($file_ext, ['xls', 'xlsx']))
+                                                                {
+                                                                    $icon_class = 'fa fa-file-excel-o';
+                                                                    $icon_color = 'color: #4CAF50;';
+                                                                }
+                                                                elseif(in_array($file_ext, ['ppt', 'pptx']))
+                                                                {
+                                                                    $icon_class = 'fa fa-file-powerpoint-o';
+                                                                    $icon_color = 'color: #FF9800;';
+                                                                }
+                                                                else
+                                                                {
+                                                                    $icon_class = 'fa fa-file-o';
+                                                                    $icon_color = 'color: #757575;';
+                                                                }
+                                                                
+                                                                $files_html .= '<a href="'.$File_Path.'" target="_blank" title="'.$File_Name.'" style="margin-right: 8px;"><i class="'.$icon_class.'" style="font-size: 20px; '.$icon_color.'"></i></a>';
+                                                            }
+
+                                                            ?>
+                                                            <tr>
+                                                                <td style="text-align:right;font-size:12px"><?php echo $Nomor_Urut ?></td>
+                                                                <td style="text-align:left;font-size:12px"><?php echo $Nama_Lengkap_User ?></td>
+                                                                <td style="text-align:left;font-size:12px"><?php echo $Indikator ?></td>
+                                                                <td style="text-align:left;font-size:12px"><?php echo $Periode ?></td>
+                                                                <td style="text-align:left;font-size:12px"><?php echo $Lokasi ?></td>
+                                                                <td style="text-align:left;font-size:12px"><?php echo $Daftar_Hari[$Hari].", ".date("d-m-Y", $Tanggal_Report_Tampilan) ?></td>
+                                                                <td style="text-align:center;font-size:12px"><?php echo $files_html ?></td>
+                                                                <td style="text-align:center;font-size:12px">
+                                                                    <?php
+                                                                    if($Checked == 1)
+                                                                    {
+                                                                        ?>
+                                                                        <span class="btn btn-success btn-sm">Approve</span>
+                                                                        <?php
+                                                                    }
+                                                                    ?>
+                                                                </td>
+                                                                
+                                                                <td style="text-align:center">
+                                                                    <?php
+                                                                    if($Hak_Akses==2)
+                                                                    {
+                                                                        ?>
+                                                                        <input type="checkbox" class="check-toggle" data-laporan-id="<?php echo $LaporanNID ?>" <?php echo ($Checked == 1) ? 'checked' : ''; ?> onchange="toggleCheck(this, '<?php echo $LaporanNID ?>')">
+                                                                        <?php
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        ?>
+                                                                        <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#modalNilai" 
+                                                                            data-laporan-id="<?php echo $LaporanNID ?>" 
+                                                                            data-tanggal="<?php echo date('d-m-Y', strtotime($Tanggal_Laporan)) ?>" 
+                                                                            data-jenis="<?php echo $Jenis ?>">Nilai</button>
+                                                                        <?php
+                                                                    }
+                                                                    ?>
+                                                                    
+                                                                </td>
+                                                            </tr>
+                                                            <?php
+                                                            $Nomor_Urut++;
+                                                        }
+                                                        ?>
+                                                        
+                                                    </tbody>
+                                                </table>
+
+                                            </div>
+                                        </div>
+
+                                    </div><!-- container -->
+
+
+                                </div> <!-- Page content Wrapper -->
+
+                            </div> <!-- content -->
+
+                            <!--<footer class="footer">
+                                Powered By Palmarius
+                            </footer>-->
+
+                        </div>
+                        <!-- End Right content here -->
+
+                    </div>
+                    <!-- END wrapper -->
+
+
+                    <script src="assets/js/jquery.min.js"></script>
+                    <script src="assets/js/bootstrap.min.js"></script>
+                    <script src="assets/js/modernizr.min.js"></script>
+                    <script src="assets/js/detect.js"></script>
+                    <script src="assets/js/fastclick.js"></script>
+                    <script src="assets/js/jquery.slimscroll.js"></script>
+                    <script src="assets/js/jquery.blockUI.js"></script>
+                    <script src="assets/js/waves.js"></script>
+                    <script src="assets/js/wow.min.js"></script>
+                    <script src="assets/js/jquery.nicescroll.js"></script>
+                    <script src="assets/js/jquery.scrollTo.min.js"></script>
+
+                    <!-- Datatables-->
+                    
+                    <script type="text/javascript" src="https://cdn.datatables.net/v/dt/dt-1.10.24/datatables.min.js"></script>
+                    <script src="assets/plugins/bootstrap-datepicker/js/bootstrap-datepicker.min.js"></script>
+
+                    <!-- Datatable init js -->
+                    <script src="assets/pages/datatables.init.js"></script>
+                    <script src="assets/js/app.js"></script>
+                    <script>
+                        function ApplyFilter() 
+                        {
+                            var Tahun = document.getElementById("inputTahun").value;
+                            var Bulan = document.getElementById("inputBulan").value;
+                            
+                            window.location.href="laporan_kpi_non_cs.php?Action=Approval_List&Tahun="+Tahun+"&Bulan="+Bulan;
+                        }
+                        function CekCabang() 
+                        {
+                            var Cabang = document.getElementById("inputCabang").value;
+                            
+                            window.location.href="laporan_kpi_non_cs.php?Action=Approval_List&Cabang="+Cabang;
+                        }
+                        
+                        function toggleCheck(checkbox, laporanId) 
+                        {
+                            var isChecked = checkbox.checked ? 1 : 0;
+                            
+                            // Send AJAX request to update database
+                            var xhr = new XMLHttpRequest();
+                            xhr.open("POST", "laporan_kpi_non_cs.php?Action=Toggle_Check", true);
+                            xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+                            
+                            xhr.onreadystatechange = function() {
+                                if (xhr.readyState === 4 && xhr.status === 200) {
+                                    // Optional: show success message
+                                    console.log("Check status updated");
+                                }
+                            };
+                            
+                            xhr.send("LaporanNID=" + laporanId + "&Checked=" + isChecked);
+                        }
+                    </script>
+                    <script type="text/javascript">
+                        //Date picker
+                        $( "#inputTanggalAwal" ).datepicker({
+                            format : 'dd-mm-yyyy',
+                            changeMonth: true,
+                            changeYear: true,
+                            showOtherMonths: true,
+                            selectOtherMonths: true
+                        });
+                        $( "#inputTanggalAkhir" ).datepicker({
+                            format : 'dd-mm-yyyy',
+                            changeMonth: true,
+                            changeYear: true,
+                            showOtherMonths: true,
+                            selectOtherMonths: true
+                        });
+
+                    </script>
+                    <script>
+                        $(document).ready(function() {
+                            $('#data-kehadiran').DataTable( {
+                                "ordering": false,
+                                "pageLength": 50,
+                            } );
+                            
+                            // Handle modal opening
+                            $('#modalNilai').on('show.bs.modal', function (event) {
+                                var button = $(event.relatedTarget);
+                                var laporanId = button.data('laporan-id');
+                                var tanggal = button.data('tanggal');
+                                var jenis = button.data('jenis');
+                                
+                                var modal = $(this);
+                                modal.find('#inputLaporanNID').val(laporanId);
+                                modal.find('#inputTanggal').val(tanggal);
+                                modal.find('#inputJenis').val(jenis);
+                                
+                                // Show/hide Nilai field based on Jenis
+                                if(jenis == 2) {
+                                    modal.find('#divNilai').show();
+                                } else {
+                                    modal.find('#divNilai').hide();
+                                }
+                            });
+                            
+                            // Handle approve button click
+                            $('#btnApprove').on('click', function() {
+                                var laporanId = $('#inputLaporanNID').val();
+                                var jenis = $('#inputJenis').val();
+                                var nilai = $('#inputNilai').val();
+                                
+                                // Validate nilai if jenis is 2
+                                if(jenis == 2 && (!nilai || nilai == '')) {
+                                    alert('Silakan isi nilai terlebih dahulu');
+                                    return;
+                                }
+                                
+                                // Send AJAX request
+                                $.ajax({
+                                    url: 'laporan_kpi_non_cs.php?Action=Approve_Nilai',
+                                    type: 'POST',
+                                    data: {
+                                        LaporanNID: laporanId,
+                                        Jenis: jenis,
+                                        Nilai: nilai
+                                    },
+                                    success: function(response) {
+                                        if(response.trim() == 'success') {
+                                            alert('Berhasil melakukan approve');
+                                            location.reload();
+                                        } else {
+                                            alert('Gagal melakukan approve: ' + response);
+                                        }
+                                    },
+                                    error: function() {
+                                        alert('Terjadi kesalahan saat mengirim data');
+                                    }
+                                });
+                            });
+                        } );
+                    </script>
+                    
+                    <!-- Modal Nilai -->
+                    <div id="modalNilai" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="modalNilaiLabel" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                                    <h4 class="modal-title" id="modalNilaiLabel">Form Penilaian</h4>
+                                </div>
+                                <div class="modal-body">
+                                    <form id="formNilai">
+                                        <input type="hidden" id="inputLaporanNID" name="LaporanNID">
+                                        <input type="hidden" id="inputJenis" name="Jenis">
+                                        
+                                        <div class="form-group">
+                                            <label for="inputTanggal">Tanggal</label>
+                                            <input type="text" class="form-control" id="inputTanggal" readonly>
+                                        </div>
+                                        
+                                        <div class="form-group" id="divNilai" style="display:none;">
+                                            <label for="inputNilai">Nilai</label>
+                                            <input type="number" class="form-control" id="inputNilai" name="Nilai" min="0" max="100" step="0.01">
+                                        </div>
+                                    </form>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                                    <button type="button" class="btn btn-success" id="btnApprove">Approve</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </body>
+            </html>
+            <?php
+        }
         elseif($_GET['Action']=='Detail_Laporan')
         {
         }
@@ -704,6 +1409,42 @@ else
             $Checked = mysqli_real_escape_string($Connection, $Checked);
             
             $sql = "UPDATE laporan_non_cs SET Checked = '".$Checked."' WHERE LaporanNID = '".$LaporanNID."'";
+            $qry = mysqli_query($Connection, $sql);
+            
+            if($qry)
+            {
+                echo "success";
+            }
+            else
+            {
+                echo "error";
+            }
+            exit;
+        }
+        elseif($_GET['Action']=='Approve_Nilai')
+        {
+            $LaporanNID = $_POST['LaporanNID'];
+            $LaporanNID = str_replace('&#39;',"'",$LaporanNID);
+            $LaporanNID = mysqli_real_escape_string($Connection, str_replace('&#34;','"',$LaporanNID));
+            
+            $Jenis = $_POST['Jenis'];
+            $Jenis = mysqli_real_escape_string($Connection, $Jenis);
+            
+            // Update Checked to 1
+            if($Jenis == 2)
+            {
+                $Nilai = $_POST['Nilai'];
+                $Nilai = mysqli_real_escape_string($Connection, $Nilai);
+                
+                // Update both Checked and Nilai
+                $sql = "UPDATE laporan_non_cs SET Checked = 1, Nilai = '".$Nilai."' WHERE LaporanNID = '".$LaporanNID."'";
+            }
+            else
+            {
+                // Update only Checked
+                $sql = "UPDATE laporan_non_cs SET Checked = 1 WHERE LaporanNID = '".$LaporanNID."'";
+            }
+            
             $qry = mysqli_query($Connection, $sql);
             
             if($qry)
