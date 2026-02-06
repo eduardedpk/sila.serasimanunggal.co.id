@@ -472,6 +472,7 @@ else
                                                     <tbody>
                                                         <?php
                                                         $Nomor_Urut = 1;
+                                                        $Periode = $Filter_Tahun . '-' . str_pad($Filter_Bulan, 2, '0', STR_PAD_LEFT);
                                                         if($Hak_Akses==2)
                                                         {
                                                             $sql = "SELECT ln.*, dk.Nama_Lengkap, ik.Indikator FROM laporan_non_cs ln 
@@ -479,8 +480,7 @@ else
                                                                         INNER JOIN indikator_kpi ik ON ik.IndikatorNID = iu.IndikatorNID
                                                                         INNER JOIN data_karyawan dk ON dk.KaryawanNID = iu.KaryawanNID
                                                                         INNER JOIN user_list ul ON ul.Username = dk.NIM
-                                                                        WHERE YEAR(ln.Tanggal_Laporan) = '".$Filter_Tahun."' 
-                                                                        AND MONTH(ln.Tanggal_Laporan) = '".$Filter_Bulan."' 
+                                                                        WHERE ln.Periode = '".$Periode."' 
                                                                         ORDER BY ln.Tanggal_Laporan DESC";
                                                         }
                                                         else
@@ -490,8 +490,7 @@ else
                                                                         INNER JOIN indikator_kpi ik ON ik.IndikatorNID = iu.IndikatorNID
                                                                         INNER JOIN data_karyawan dk ON dk.KaryawanNID = iu.KaryawanNID
                                                                         INNER JOIN user_list ul ON ul.Username = dk.NIM
-                                                                        WHERE YEAR(ln.Tanggal_Laporan) = '".$Filter_Tahun."' 
-                                                                        AND MONTH(ln.Tanggal_Laporan) = '".$Filter_Bulan."' 
+                                                                        WHERE ln.Periode = '".$Periode."' 
                                                                         AND ul.UserNID = '".$Last_UserNID."'
                                                                         ORDER BY ln.Tanggal_Laporan DESC";
                                                         }
