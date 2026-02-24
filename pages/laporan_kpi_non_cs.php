@@ -207,12 +207,18 @@ else
                                         </ul>
                                         <?php
                                     }
-                                    elseif($Hak_Akses==2) //Kepala Sekolah
+                                    elseif($Hak_Akses==2) //Manager
                                     {
                                         ?>
                                         <ul>
                                             <li>
                                                 <a href="index.php" class="waves-effect"><i class="ti-home"></i><span> Dashboard </span></a>
+                                            </li>
+                                            <li>
+                                                <a href="laporan_kpi_non_cs.php?Action=Generate_Rekap" class="waves-effect"><i class="fa fa-tv"></i><span> Rekap </span></a>
+                                            </li>
+                                            <li>
+                                                <a href="laporan_kpi_non_cs.php?Action=Approval_List" class="waves-effect"><i class="fa fa-check-square-o"></i><span> Approval Laporan </span></a>
                                             </li>
                                             <li>
                                                 <a href="index.php" class="waves-effect"><i class="ti-back-left"></i><span> Kembali </span></a>
@@ -430,7 +436,7 @@ else
                                                 else
                                                 {
                                                     ?>
-                                                    <p><p class="btn btn-info" title="User tidak memiliki akses untuk melakukan penambahan data"><i class="fa fa-plus"></i> Data</p></p>
+                                                    <!--<p><p class="btn btn-info" title="User tidak memiliki akses untuk melakukan penambahan data"><i class="fa fa-plus"></i> Data</p></p>-->
                                                     <?php
                                                 }
                                                 ?>
@@ -448,6 +454,7 @@ else
                                                                 <th width=5% rowspan=1 style="text-align:left;vertical-align:middle">Periode</th>
                                                                 <th width=10% rowspan=1 style="text-align:left;vertical-align:middle">Lokasi</th>
                                                                 <th width=15% rowspan=1 style="text-align:left;vertical-align:middle">Tanggal</th>
+                                                                <th width=8% rowspan=1 style="text-align:left;vertical-align:middle">Nilai</th>
                                                                 <th width=15% rowspan=1 style="text-align:center;vertical-align:middle">File</th>
                                                                 <th width=5% colspan=1 style="text-align:left;vertical-align:middle">Action</th>
                                                                 <?php
@@ -459,6 +466,7 @@ else
                                                                 <th width=5% rowspan=1 style="text-align:left;vertical-align:middle">Periode</th>
                                                                 <th width=10% rowspan=1 style="text-align:left;vertical-align:middle">Lokasi</th>
                                                                 <th width=15% rowspan=1 style="text-align:left;vertical-align:middle">Tanggal</th>
+                                                                <th width=8% rowspan=1 style="text-align:left;vertical-align:middle">Nilai</th>
                                                                 <th width=15% rowspan=1 style="text-align:center;vertical-align:middle">File</th>
                                                                 <th width=5% colspan=1 style="text-align:left;vertical-align:middle">Action</th>
                                                                 <?php
@@ -507,6 +515,7 @@ else
                                                             $Checked = $buff_Data_Siswa['Checked'];
                                                             $Tanggal_Report_Tampilan = strtotime($Tanggal_Laporan);
                                                             $Hari = date("w", $Tanggal_Report_Tampilan );
+                                                            $Nilai = $buff_Data_Siswa['Nilai'];
 
                                                             // Get files for this report
                                                             $sql_files = "SELECT * FROM laporan_kpi_files WHERE LaporanNID = '".$LaporanNID."'";
@@ -574,6 +583,7 @@ else
                                                                 <td style="text-align:left;font-size:12px"><?php echo $Periode ?></td>
                                                                 <td style="text-align:left;font-size:12px"><?php echo $Lokasi ?></td>
                                                                 <td style="text-align:left;font-size:12px"><?php echo $Daftar_Hari[$Hari].", ".date("d-m-Y", $Tanggal_Report_Tampilan) ?></td>
+                                                                <td style="text-align:left;font-size:12px"><?php echo (trim((string)$Nilai) === '' ? '-' : $Nilai) ?></td>
                                                                 <td style="text-align:center;font-size:12px"><?php echo $files_html ?></td>
                                                                 
                                                                 <td style="text-align:center">
@@ -581,7 +591,7 @@ else
                                                                     if($Hak_Akses==2)
                                                                     {
                                                                         ?>
-                                                                        <input type="checkbox" class="check-toggle" data-laporan-id="<?php echo $LaporanNID ?>" <?php echo ($Checked == 1) ? 'checked' : ''; ?> onchange="toggleCheck(this, '<?php echo $LaporanNID ?>')">
+                                                                        <!--<input type="checkbox" class="check-toggle" data-laporan-id="<?php echo $LaporanNID ?>" <?php echo ($Checked == 1) ? 'checked' : ''; ?> onchange="toggleCheck(this, '<?php echo $LaporanNID ?>')">-->
                                                                         <?php
                                                                     }
                                                                     else
@@ -708,6 +718,13 @@ else
             </html>
             <?php
         }
+        elseif($_GET['Action']=='Generate_Rekap')
+        {
+            $Tahun = $_SESSION['Filter_Tahun'];
+            $Bulan = $_SESSION['Filter_Bulan'];
+            echo $Tahun."-".$Bulan;
+
+        }
         elseif($_GET['Action']=='Approval_List')
         {
 
@@ -832,7 +849,16 @@ else
                                     </div>
                                 </div>
                                 <!--- Divider -->
-
+                                <?php
+                                $sql="SELECT dk.KaryawanNID, dk.Status_Kepala_Divisi FROM data_karyawan dk
+                                        WHERE NIM='".$Last_User."'
+                                        LIMIT 1";
+                                $qry=mysqli_query($Connection, $sql);
+                                $buff=mysqli_fetch_array($qry);
+                                $KaryawanNID=$buff['KaryawanNID'];
+                                $_SESSION['KaryawanNID']=$KaryawanNID;
+                                $Status_Kepala_Divisi=$buff['Status_Kepala_Divisi'];
+                                ?>
 
                                 <div id="sidebar-menu">
                                     <?php
@@ -856,7 +882,7 @@ else
                                         </ul>
                                         <?php
                                     }
-                                    elseif($Hak_Akses==2) //Kepala Sekolah
+                                    elseif($Hak_Akses==2) //Manager
                                     {
                                         ?>
                                         <ul>
@@ -1062,13 +1088,12 @@ else
                                                             <th width=25% rowspan=1 style="text-align:left;vertical-align:middle">Indikator</th>
                                                             <th width=5% rowspan=1 style="text-align:left;vertical-align:middle">Periode</th>
                                                             <th width=10% rowspan=1 style="text-align:left;vertical-align:middle">Lokasi</th>
+                                                            <th width=12% rowspan=1 style="text-align:left;vertical-align:middle">Target</th>
                                                             <th width=15% rowspan=1 style="text-align:left;vertical-align:middle">Tanggal</th>
+                                                            <th width=8% rowspan=1 style="text-align:left;vertical-align:middle">Nilai</th>
                                                             <th width=15% rowspan=1 style="text-align:center;vertical-align:middle">File</th>
-                                                            <th width=5% rowspan=1 style="text-align:center;vertical-align:middle">Status</th>
+                                                            <th width=5% rowspan=1 style="text-align:center;vertical-align:middle">Approved</th>
                                                             <th width=5% colspan=1 style="text-align:left;vertical-align:middle">Action</th>
-                                                            
-                                                            
-                                                            
                                                         </tr>
                                                     </thead>
 
@@ -1076,16 +1101,40 @@ else
                                                     <tbody>
                                                         <?php
                                                         $Nomor_Urut = 1;
+                                                        echo $Hak_Akses;
+                                                        if($Hak_Akses==2)
+                                                        {
+                                                            $sql = "SELECT ln.*, dk.Nama_Lengkap, ik.Indikator, iu.Jenis, iu.Indikator_UserNID, dk.KaryawanNID FROM laporan_non_cs ln 
+                                                                        INNER JOIN indikator_kpi_user iu ON iu.Indikator_UserNID = ln.Indikator_UserNID
+                                                                        INNER JOIN indikator_kpi ik ON ik.IndikatorNID = iu.IndikatorNID
+                                                                        INNER JOIN data_karyawan dk ON dk.KaryawanNID = iu.KaryawanNID
+                                                                        INNER JOIN user_list ul ON ul.Username = dk.NIM
+                                                                        WHERE ln.Periode = '".$Periode_Laporan."' 
+                                                                        AND dk.Status_Kepala_Divisi = 1
+                                                                        ORDER BY ln.Tanggal_Laporan DESC";
+                                                            //echo $sql.";<br>1";
+                                                        }
+                                                        else
+                                                        {
+                                                            if($Status_Kepala_Divisi==1)
+                                                            {
+                                                                $sql = "SELECT ln.*, dk.Nama_Lengkap, ik.Indikator, iu.Jenis, iu.Indikator_UserNID, dk.KaryawanNID FROM laporan_non_cs ln 
+                                                                            INNER JOIN indikator_kpi_user iu ON iu.Indikator_UserNID = ln.Indikator_UserNID
+                                                                            INNER JOIN indikator_kpi ik ON ik.IndikatorNID = iu.IndikatorNID
+                                                                            INNER JOIN data_karyawan dk ON dk.KaryawanNID = iu.KaryawanNID
+                                                                            INNER JOIN user_list ul ON ul.Username = dk.NIM
+                                                                            WHERE ln.Periode = '".$Periode_Laporan."' 
+                                                                            AND dk.Kepala_Divisi = '".$_SESSION['KaryawanNID']."'
+                                                                            ORDER BY ln.Tanggal_Laporan DESC";
+                                                                //echo $sql.";<br>";
+                                                            }
+                                                            else
+                                                            {
+                                                                
+                                                            }
+                                                            
+                                                        }
                                                         
-                                                        $sql = "SELECT ln.*, dk.Nama_Lengkap, ik.Indikator, iu.Jenis, iu.Indikator_UserNID FROM laporan_non_cs ln 
-                                                                    INNER JOIN indikator_kpi_user iu ON iu.Indikator_UserNID = ln.Indikator_UserNID
-                                                                    INNER JOIN indikator_kpi ik ON ik.IndikatorNID = iu.IndikatorNID
-                                                                    INNER JOIN data_karyawan dk ON dk.KaryawanNID = iu.KaryawanNID
-                                                                    INNER JOIN user_list ul ON ul.Username = dk.NIM
-                                                                    WHERE YEAR(ln.Tanggal_Laporan) = '".$Filter_Tahun."' 
-                                                                    AND MONTH(ln.Tanggal_Laporan) = '".$Filter_Bulan."' 
-                                                                    AND dk.Kepala_Divisi = '".$_SESSION['KaryawanNID']."'
-                                                                    ORDER BY ln.Tanggal_Laporan DESC";
                                                         
                                                         //echo $sql.";<br>";
                                                         $qry_Data_Siswa = mysqli_query($Connection, $sql);
@@ -1100,8 +1149,64 @@ else
                                                             $Checked = $buff_Data_Siswa['Checked'];
                                                             $Jenis = $buff_Data_Siswa['Jenis'];
                                                             $Indikator_UserNID = $buff_Data_Siswa['Indikator_UserNID'];
+                                                            $Nilai = $buff_Data_Siswa['Nilai'];
                                                             $Tanggal_Report_Tampilan = strtotime($Tanggal_Laporan);
                                                             $Hari = date("w", $Tanggal_Report_Tampilan );
+                                                            $KaryawanNID = $buff_Data_Siswa['KaryawanNID'];
+
+                                                            $Target = "";
+                                                            $Target_Label = "Target";
+                                                            $Target_Rows = array();
+                                                            $sql_target = "SELECT ikut.Batas_Bawah, ikut.Batas_Atas, ikut.Score, ikut.Tanda, ikut.Jenis FROM indikator_kpi_user_target ikut
+                                                                                WHERE ikut.Indikator_UserNID = '".$Indikator_UserNID."'
+                                                                                ORDER BY ikut.Score DESC;";
+                                                            //echo $sql_target.";<br>";
+                                                            $qry_target = mysqli_query($Connection, $sql_target);
+                                                            while($buff_target = mysqli_fetch_array($qry_target))
+                                                            {
+                                                                $Batas_Bawah = $buff_target['Batas_Bawah'];
+                                                                $Batas_Atas = $buff_target['Batas_Atas'];
+                                                                $Score = $buff_target['Score'];
+                                                                $Tanda = $buff_target['Tanda'];
+                                                                $Jenis_Target = $buff_target['Jenis'];
+                                                                if(intval($Jenis_Target) == 1)
+                                                                {
+                                                                    $Target_Label = "Tanggal";
+                                                                }
+                                                                elseif(intval($Jenis_Target) == 2)
+                                                                {
+                                                                    $Target_Label = "Kuantitas";
+                                                                }
+
+                                                                if($Batas_Atas == "")
+                                                                {
+                                                                    $Target_Text = (($Tanda=="=")?"":$Tanda).$Batas_Bawah;
+                                                                }
+                                                                else
+                                                                {
+                                                                    $Target_Text = $Batas_Bawah." s/d ".$Batas_Atas;
+                                                                }
+                                                                $Target_Rows[] = array('Target' => $Target_Text, 'Score' => $Score);
+                                                            }
+
+                                                            if(count($Target_Rows) > 0)
+                                                            {
+                                                                $Target = '<table class="table table-condensed" style="margin-bottom:0;font-size:12px;">';
+                                                                $Target .= '<thead><tr>';
+                                                                $Target .= '<th style="padding:3px 6px;border-top:none;">'.$Target_Label.'</th>';
+                                                                $Target .= '<th style="padding:3px 6px;border-top:none;text-align:right;">Score</th>';
+                                                                $Target .= '</tr></thead><tbody>';
+
+                                                                foreach($Target_Rows as $Target_Row)
+                                                                {
+                                                                    $Target .= '<tr>';
+                                                                    $Target .= '<td style="padding:3px 6px;">'.$Target_Row['Target'].'</td>';
+                                                                    $Target .= '<td style="padding:3px 6px;text-align:right;">'.$Target_Row['Score'].'</td>';
+                                                                    $Target .= '</tr>';
+                                                                }
+
+                                                                $Target .= '</tbody></table>';
+                                                            }
 
                                                             // Get files for this report
                                                             $sql_files = "SELECT * FROM laporan_kpi_files WHERE LaporanNID = '".$LaporanNID."'";
@@ -1161,17 +1266,18 @@ else
                                                                 <td style="text-align:left;font-size:12px"><?php echo $Indikator ?></td>
                                                                 <td style="text-align:left;font-size:12px"><?php echo $Periode ?></td>
                                                                 <td style="text-align:left;font-size:12px"><?php echo $Lokasi ?></td>
+                                                                <td style="text-align:left;font-size:12px"><?php echo ($Target === '' ? '-' : $Target) ?></td>
                                                                 <td style="text-align:left;font-size:12px"><?php echo $Daftar_Hari[$Hari].", ".date("d-m-Y", $Tanggal_Report_Tampilan) ?></td>
+                                                                <td style="text-align:left;font-size:12px"><?php echo (trim((string)$Nilai) === '' ? '-' : $Nilai) ?></td>
                                                                 <td style="text-align:center;font-size:12px"><?php echo $files_html ?></td>
                                                                 <td style="text-align:center;font-size:12px">
-                                                                    <?php
-                                                                    if($Checked == 1)
-                                                                    {
-                                                                        ?>
-                                                                        <span class="btn btn-success btn-sm">Approve</span>
-                                                                        <?php
-                                                                    }
-                                                                    ?>
+                                                                    <button type="button"
+                                                                        class="btn btn-xs <?php echo (intval($Checked) == 1) ? 'btn-success' : 'btn-danger'; ?>"
+                                                                        data-checked="<?php echo intval($Checked); ?>"
+                                                                        onclick="toggleCheckButton(this, '<?php echo $LaporanNID ?>')"
+                                                                        title="Klik untuk mengubah status">
+                                                                        <i class="fa <?php echo (intval($Checked) == 1) ? 'fa-check' : 'fa-times'; ?>"></i>
+                                                                    </button>
                                                                 </td>
                                                                 
                                                                 <td style="text-align:center">
@@ -1179,7 +1285,10 @@ else
                                                                     if($Hak_Akses==2)
                                                                     {
                                                                         ?>
-                                                                        <input type="checkbox" class="check-toggle" data-laporan-id="<?php echo $LaporanNID ?>" <?php echo ($Checked == 1) ? 'checked' : ''; ?> onchange="toggleCheck(this, '<?php echo $LaporanNID ?>')">
+                                                                        <!--<input type="checkbox" class="check-toggle" data-laporan-id="<?php echo $LaporanNID ?>" <?php echo ($Checked == 1) ? 'checked' : ''; ?> onchange="toggleCheck(this, '<?php echo $LaporanNID ?>')">-->
+                                                                        <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#modalNilai" 
+                                                                            data-laporan-id="<?php echo $LaporanNID ?>" 
+                                                                            data-nilai="<?php echo htmlspecialchars($Nilai, ENT_QUOTES) ?>">Nilai</button>
                                                                         <?php
                                                                     }
                                                                     else
@@ -1187,8 +1296,7 @@ else
                                                                         ?>
                                                                         <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#modalNilai" 
                                                                             data-laporan-id="<?php echo $LaporanNID ?>" 
-                                                                            data-tanggal="<?php echo date('d-m-Y', strtotime($Tanggal_Laporan)) ?>" 
-                                                                            data-jenis="<?php echo $Jenis ?>">Nilai</button>
+                                                                            data-nilai="<?php echo htmlspecialchars($Nilai, ENT_QUOTES) ?>">Nilai</button>
                                                                         <?php
                                                                     }
                                                                     ?>
@@ -1259,9 +1367,10 @@ else
                             window.location.href="laporan_kpi_non_cs.php?Action=Approval_List&Cabang="+Cabang;
                         }
                         
-                        function toggleCheck(checkbox, laporanId) 
+                        function toggleCheckButton(button, laporanId) 
                         {
-                            var isChecked = checkbox.checked ? 1 : 0;
+                            var currentChecked = parseInt(button.getAttribute('data-checked')) || 0;
+                            var isChecked = currentChecked === 1 ? 0 : 1;
                             
                             // Send AJAX request to update database
                             var xhr = new XMLHttpRequest();
@@ -1270,8 +1379,20 @@ else
                             
                             xhr.onreadystatechange = function() {
                                 if (xhr.readyState === 4 && xhr.status === 200) {
-                                    // Optional: show success message
-                                    console.log("Check status updated");
+                                    if(xhr.responseText.trim() === 'success') {
+                                        button.setAttribute('data-checked', isChecked);
+                                        if(isChecked === 1) {
+                                            button.classList.remove('btn-danger');
+                                            button.classList.add('btn-success');
+                                            button.innerHTML = '<i class="fa fa-check"></i>';
+                                        } else {
+                                            button.classList.remove('btn-success');
+                                            button.classList.add('btn-danger');
+                                            button.innerHTML = '<i class="fa fa-times"></i>';
+                                        }
+                                    } else {
+                                        alert('Gagal mengubah status');
+                                    }
                                 }
                             };
                             
@@ -1307,30 +1428,19 @@ else
                             $('#modalNilai').on('show.bs.modal', function (event) {
                                 var button = $(event.relatedTarget);
                                 var laporanId = button.data('laporan-id');
-                                var tanggal = button.data('tanggal');
-                                var jenis = button.data('jenis');
+                                var nilai = button.data('nilai');
                                 
                                 var modal = $(this);
                                 modal.find('#inputLaporanNID').val(laporanId);
-                                modal.find('#inputTanggal').val(tanggal);
-                                modal.find('#inputJenis').val(jenis);
-                                
-                                // Show/hide Nilai field based on Jenis
-                                if(jenis == 2) {
-                                    modal.find('#divNilai').show();
-                                } else {
-                                    modal.find('#divNilai').hide();
-                                }
+                                modal.find('#inputNilaiModal').val(nilai);
                             });
                             
-                            // Handle approve button click
-                            $('#btnApprove').on('click', function() {
+                            // Handle simpan nilai button click
+                            $('#btnSimpanNilai').on('click', function() {
                                 var laporanId = $('#inputLaporanNID').val();
-                                var jenis = $('#inputJenis').val();
-                                var nilai = $('#inputNilai').val();
+                                var nilai = $('#inputNilaiModal').val();
                                 
-                                // Validate nilai if jenis is 2
-                                if(jenis == 2 && (!nilai || nilai == '')) {
+                                if(!nilai || nilai == '') {
                                     alert('Silakan isi nilai terlebih dahulu');
                                     return;
                                 }
@@ -1341,15 +1451,14 @@ else
                                     type: 'POST',
                                     data: {
                                         LaporanNID: laporanId,
-                                        Jenis: jenis,
                                         Nilai: nilai
                                     },
                                     success: function(response) {
                                         if(response.trim() == 'success') {
-                                            alert('Berhasil melakukan approve');
+                                            alert('Nilai berhasil disimpan');
                                             location.reload();
                                         } else {
-                                            alert('Gagal melakukan approve: ' + response);
+                                            alert('Gagal menyimpan nilai: ' + response);
                                         }
                                     },
                                     error: function() {
@@ -1371,22 +1480,15 @@ else
                                 <div class="modal-body">
                                     <form id="formNilai">
                                         <input type="hidden" id="inputLaporanNID" name="LaporanNID">
-                                        <input type="hidden" id="inputJenis" name="Jenis">
-                                        
                                         <div class="form-group">
-                                            <label for="inputTanggal">Tanggal</label>
-                                            <input type="text" class="form-control" id="inputTanggal" readonly>
-                                        </div>
-                                        
-                                        <div class="form-group" id="divNilai" style="display:none;">
-                                            <label for="inputNilai">Nilai</label>
-                                            <input type="number" class="form-control" id="inputNilai" name="Nilai" min="0" max="100" step="0.01">
+                                            <label for="inputNilaiModal">Nilai</label>
+                                            <input type="number" class="form-control" id="inputNilaiModal" name="Nilai" min="0" max="100" step="0.01">
                                         </div>
                                     </form>
                                 </div>
                                 <div class="modal-footer">
-                                    <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-                                    <button type="button" class="btn btn-success" id="btnApprove">Approve</button>
+                                    <button type="button" class="btn btn-default" data-dismiss="modal">Batal</button>
+                                    <button type="button" class="btn btn-success" id="btnSimpanNilai">Simpan</button>
                                 </div>
                             </div>
                         </div>
@@ -1426,23 +1528,14 @@ else
             $LaporanNID = str_replace('&#39;',"'",$LaporanNID);
             $LaporanNID = mysqli_real_escape_string($Connection, str_replace('&#34;','"',$LaporanNID));
             
-            $Jenis = $_POST['Jenis'];
-            $Jenis = mysqli_real_escape_string($Connection, $Jenis);
-            
-            // Update Checked to 1
-            if($Jenis == 2)
-            {
-                $Nilai = $_POST['Nilai'];
-                $Nilai = mysqli_real_escape_string($Connection, $Nilai);
-                
-                // Update both Checked and Nilai
-                $sql = "UPDATE laporan_non_cs SET Checked = 1, Nilai = '".$Nilai."' WHERE LaporanNID = '".$LaporanNID."'";
-            }
-            else
-            {
-                // Update only Checked
-                $sql = "UPDATE laporan_non_cs SET Checked = 1 WHERE LaporanNID = '".$LaporanNID."'";
-            }
+            $Nilai = $_POST['Nilai'];
+            $Nilai = mysqli_real_escape_string($Connection, $Nilai);
+
+            $sql = "UPDATE laporan_non_cs SET 
+                        Nilai = '".$Nilai."',
+                        Last_User = '".$Last_UserNID."',
+                        Last_Update = NOW()
+                        WHERE LaporanNID = '".$LaporanNID."'";
             
             $qry = mysqli_query($Connection, $sql);
             
@@ -1513,12 +1606,13 @@ else
                 $inputFileBefore = "";
                 
                 $Tanggal_Pembelian = date("d-m-Y");
-
+                
                 $Creator = "";
                 $Last_User = "";
                 $Create_Date = "";
                 $Last_Update = "";
-                $Tanggal_Laporan = "";
+                $Tanggal_Laporan = date("Y-m-d");
+                $Nilai = "";
             }
             else
             {
@@ -1537,6 +1631,7 @@ else
                 $Tanggal_Laporan = $buff['Tanggal_Laporan'];
                 $Lokasi = $buff['Lokasi'];
                 $Image_Before = $buff['Image_Before'];
+                $Nilai = $buff['Nilai'];
                 
                 $Create_Date = $buff['Create_Date'];
                 $Last_Update = $buff['Last_Update'];
@@ -1905,6 +2000,20 @@ else
                                                             
                                                             <div class="col-sm-8 input-group date" >
                                                                 <input type="text" class="form-control pull-right" id="inputLokasi" name="Lokasi" placehoder="Lokasi kunjungan (jika ada)" value="<?php echo $Lokasi ?>">
+                                                            </div>
+                                                        </div>
+                                                        <div class="form-group">
+                                                            <label for="inputTanggalLaporan" class="col-sm-3 ">Tanggal Laporan</label>
+                                                            
+                                                            <div class="col-sm-8 input-group date" >
+                                                                <input type="date" class="form-control pull-right" id="inputTanggalLaporan" name="Tanggal_Laporan" value="<?php echo $Tanggal_Laporan ?>">
+                                                            </div>
+                                                        </div>
+                                                        <div class="form-group">
+                                                            <label for="inputNilai" class="col-sm-3 ">Nilai</label>
+                                                            
+                                                            <div class="col-sm-8 input-group date" >
+                                                                <input type="number" step="any" class="form-control pull-right" id="inputNilai" name="Nilai" value="<?php echo $Nilai ?>">
                                                             </div>
                                                         </div>
                                                         <div class="form-group">
@@ -2294,11 +2403,17 @@ else
                 $Indikator_UserNID  = $_POST['Indikator_UserNID'];
                 $Indikator_UserNID  = str_replace('&#39;',"'",$Indikator_UserNID );
                 $Indikator_UserNID  = mysqli_real_escape_string($Connection, str_replace('&#34;','"',$Indikator_UserNID ));
-                $Tanggal_Laporan = date("Y-m-d");
+                $Tanggal_Laporan  = $_POST['Tanggal_Laporan'];
+                $Tanggal_Laporan  = str_replace('&#39;',"'",$Tanggal_Laporan );
+                $Tanggal_Laporan  = mysqli_real_escape_string($Connection, str_replace('&#34;','"',$Tanggal_Laporan ));
 
                 $Lokasi  = $_POST['Lokasi'];
                 $Lokasi  = str_replace('&#39;',"'",$Lokasi );
                 $Lokasi  = mysqli_real_escape_string($Connection, str_replace('&#34;','"',$Lokasi ));
+
+                $Nilai  = $_POST['Nilai'];
+                $Nilai  = str_replace('&#39;',"'",$Nilai );
+                $Nilai  = mysqli_real_escape_string($Connection, str_replace('&#34;','"',$Nilai ));
 
                 $Keterangan = "";
 
@@ -2314,7 +2429,9 @@ else
                     $sql = "UPDATE laporan_non_cs SET
                             Indikator_UserNID = '".$Indikator_UserNID."',
                             Periode = '".$Periode."',
+                            Tanggal_Laporan = '".$Tanggal_Laporan."',
                             Lokasi = '".$Lokasi."',
+                            Nilai = '".$Nilai."',
                             Last_User = '".$Last_UserNID."',
                             Last_Update = NOW()
                             WHERE LaporanNID = '".$LaporanNID."'";
@@ -2439,7 +2556,7 @@ else
                             // Jika selisih lebih dari 4 hari, maka tidak boleh simpan
                             if($Selisih_Hari > 4)
                             {
-                                $Simpan = False;
+                                //$Simpan = False;
                             }
                         }
                     }
@@ -2472,9 +2589,9 @@ else
                         //Jika lolos validasi tanggal atau validasi kuantitas
                         // Insert laporan data
                         $sql = "INSERT INTO laporan_non_cs 
-                                (Indikator_UserNID, Periode, Tanggal_Laporan, Lokasi, Creator, Create_Date, Last_User, Last_Update) 
+                            (Indikator_UserNID, Periode, Tanggal_Laporan, Lokasi, Nilai, Creator, Create_Date, Last_User, Last_Update) 
                                 VALUES 
-                                ('".$Indikator_UserNID."', '".$Periode."', '".$Tanggal_Laporan."', '".$Lokasi."', '".$Last_UserNID."', NOW(), '".$Last_UserNID."', NOW())";
+                            ('".$Indikator_UserNID."', '".$Periode."', '".$Tanggal_Laporan."', '".$Lokasi."', '".$Nilai."', '".$Last_UserNID."', NOW(), '".$Last_UserNID."', NOW())";
                         //echo $sql.";<br>";
                         if(mysqli_query($Connection, $sql))
                         {
@@ -2585,25 +2702,19 @@ else
                             <?php
                         }
                     }
+                    else
+                    {
+                        // Jika validasi tanggal gagal (lebih dari 4 hari terlambat)
+                        ?>
+                        <script>
+                            alert('Gagal menyimpan! Anda terlambat lebih dari 4 hari dari tanggal target (<?php echo $Target ?>).');
+                            window.history.back();
+                        </script>
+                        <?php
+                    }
                    
                 }
-                else
-                {
-                    // Jika validasi tanggal gagal (lebih dari 4 hari terlambat)
-                    ?>
-                    <script>
-                        alert('Gagal menyimpan! Anda terlambat lebih dari 4 hari dari tanggal target (<?php echo $Target ?>).');
-                        window.history.back();
-                    </script>
-                    <?php
-                }
             }
-            
-            ?>
-                <script>
-                    //window.location.href="laporan_kpi_non_cs.php?Action=Daftar";
-                </script>
-            <?php
         }
         elseif($_POST['Action']=='Dokumen_Detail_Update' || $_POST['Action']=='Dokumen_Detail_Tambah')
         {

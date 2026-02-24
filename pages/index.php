@@ -341,7 +341,7 @@ else
                                         </li>
                                         <!--<li>
                                             <a href="laporan_harian_nonCS.php?Action=Daftar" class="waves-effect"><i class="mdi mdi-odnoklassniki"></i><span> Laporan Harian </span></a>
-                                        </li>-->
+                                        </li>--> 
                                         <li>
                                             <a href="laporan_kpi_non_cs.php?Action=Daftar" class="waves-effect"><i class="mdi mdi-odnoklassniki"></i><span> Laporan KPI </span></a>
                                         </li>
