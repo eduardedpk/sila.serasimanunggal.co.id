@@ -669,6 +669,13 @@ else
                             window.location.href="laporan_kpi_non_cs.php?Action=Daftar&Cabang="+Cabang;
                         }
                         
+                        function OpenRekap()
+                        {
+                            var Tahun = document.getElementById("inputTahun").value;
+                            var Bulan = document.getElementById("inputBulan").value;
+                            window.open("laporan_kpi_non_cs.php?Action=Rekap_KPI&Tahun="+Tahun+"&Bulan="+Bulan, '_blank');
+                        }
+
                         function toggleCheck(checkbox, laporanId) 
                         {
                             var isChecked = checkbox.checked ? 1 : 0;
@@ -1020,60 +1027,63 @@ else
                                 <div class="page-content-wrapper ">
 
                                     <div class="container">
-                                        <div>
-                                            <a href="#demo" class="" data-toggle="collapse">Filter</a>
-                                            
-                                        </div>
-                                        <div id="demo" class="collapse" style="margin-bottom: 15px; margin-top: 10px;">
-                                            <div class="row">
-                                                <div class="col-md-4">
-                                                    <label>Tahun:</label>
-                                                    <select id="inputTahun" class="form-control" onchange="ApplyFilter()">
-                                                        <?php
-                                                        // Get distinct years from Tanggal_Laporan
-                                                        $sql_tahun = "SELECT DISTINCT YEAR(Tanggal_Laporan) AS Tahun FROM laporan_non_cs ORDER BY Tahun DESC";
-                                                        $qry_tahun = mysqli_query($Connection, $sql_tahun);
-                                                        
-                                                        $tahun_list = array();
-                                                        while($buff_tahun = mysqli_fetch_array($qry_tahun))
-                                                        {
-                                                            $tahun_list[] = $buff_tahun['Tahun'];
-                                                        }
-                                                        
-                                                        // Add current year if not in list
-                                                        $current_year = date('Y');
-                                                        if(!in_array($current_year, $tahun_list))
-                                                        {
-                                                            $tahun_list[] = $current_year;
-                                                            rsort($tahun_list);
-                                                        }
-                                                        
-                                                        foreach($tahun_list as $tahun)
-                                                        {
-                                                            $selected = ($tahun == $Filter_Tahun) ? 'selected' : '';
-                                                            echo '<option value="'.$tahun.'" '.$selected.'>'.$tahun.'</option>';
-                                                        }
-                                                        ?>
-                                                    </select>
-                                                </div>
-                                                <div class="col-md-4">
-                                                    <label>Bulan:</label>
-                                                    <select id="inputBulan" class="form-control" onchange="ApplyFilter()">
-                                                        <?php
-                                                        for($i = 1; $i <= 12; $i++)
-                                                        {
-                                                            $bulan_val = str_pad($i, 2, '0', STR_PAD_LEFT);
-                                                            $selected = ($bulan_val == $Filter_Bulan) ? 'selected' : '';
-                                                            echo '<option value="'.$bulan_val.'" '.$selected.'>'.$Daftar_Bulan[$i].'</option>';
-                                                        }
-                                                        ?>
-                                                    </select>
-                                                </div>
-                                                <div class="col-md-4">
-                                                    <label>&nbsp;</label><br>
-                                                    <button type="button" class="btn btn-primary" onclick="ApplyFilter()"><i class="fa fa-filter"></i> Terapkan Filter</button>
-                                                </div>
+                                        
+                                        
+                                        <div class="row">
+                                            <div class="col-md-4">
+                                                <label>Tahun:</label>
+                                                <select id="inputTahun" class="form-control" onchange="ApplyFilter()">
+                                                    <?php
+                                                    // Get distinct years from Tanggal_Laporan
+                                                    $sql_tahun = "SELECT DISTINCT YEAR(Tanggal_Laporan) AS Tahun FROM laporan_non_cs ORDER BY Tahun DESC";
+                                                    $qry_tahun = mysqli_query($Connection, $sql_tahun);
+                                                    
+                                                    $tahun_list = array();
+                                                    while($buff_tahun = mysqli_fetch_array($qry_tahun))
+                                                    {
+                                                        $tahun_list[] = $buff_tahun['Tahun'];
+                                                    }
+                                                    
+                                                    // Add current year if not in list
+                                                    $current_year = date('Y');
+                                                    if(!in_array($current_year, $tahun_list))
+                                                    {
+                                                        $tahun_list[] = $current_year;
+                                                        rsort($tahun_list);
+                                                    }
+                                                    
+                                                    foreach($tahun_list as $tahun)
+                                                    {
+                                                        $selected = ($tahun == $Filter_Tahun) ? 'selected' : '';
+                                                        echo '<option value="'.$tahun.'" '.$selected.'>'.$tahun.'</option>';
+                                                    }
+                                                    ?>
+                                                </select>
                                             </div>
+                                            <div class="col-md-4">
+                                                <label>Bulan:</label>
+                                                <select id="inputBulan" class="form-control" onchange="ApplyFilter()">
+                                                    <?php
+                                                    for($i = 1; $i <= 12; $i++)
+                                                    {
+                                                        $bulan_val = str_pad($i, 2, '0', STR_PAD_LEFT);
+                                                        $selected = ($bulan_val == $Filter_Bulan) ? 'selected' : '';
+                                                        echo '<option value="'.$bulan_val.'" '.$selected.'>'.$Daftar_Bulan[$i].'</option>';
+                                                    }
+                                                    ?>
+                                                </select>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <button type="button" class="btn btn-primary" onclick="ApplyFilter()"><i class="fa fa-filter"></i> Terapkan Filter</button>
+                                            </div>
+                                        </div>
+                                        <div class="row" style="margin-top:10px;">
+                                            <div class="col-md-4">
+                                                <button type="button" class="btn btn-primary" onclick="OpenRekap()"><i class="fa fa-paper-plane"></i> Rekap</button>
+                                            </div>
+                                        </div>
+                                        <div class="row" style="margin-top:10px;">
+                                            
                                         </div>
                                         <div class="panel">
                                             <div class="panel-body table-responsive">
@@ -1366,6 +1376,13 @@ else
                             
                             window.location.href="laporan_kpi_non_cs.php?Action=Approval_List&Cabang="+Cabang;
                         }
+
+                        function OpenRekap()
+                        {
+                            var Tahun = document.getElementById("inputTahun").value;
+                            var Bulan = document.getElementById("inputBulan").value;
+                            window.open("laporan_kpi_non_cs.php?Action=Rekap_KPI&Tahun="+Tahun+"&Bulan="+Bulan, '_blank');
+                        }
                         
                         function toggleCheckButton(button, laporanId) 
                         {
@@ -1497,8 +1514,300 @@ else
             </html>
             <?php
         }
-        elseif($_GET['Action']=='Detail_Laporan')
+        elseif($_GET['Action']=='Rekap_KPI')
         {
+            // Get filter values
+            $Tahun = isset($_GET['Tahun']) ? $_GET['Tahun'] : date('Y');
+            $Bulan = isset($_GET['Bulan']) ? str_pad($_GET['Bulan'], 2, '0', STR_PAD_LEFT) : date('m');
+
+            $sql="SELECT iku.KaryawanNID, dk.NIM, dk.Nama_Lengkap FROM indikator_kpi_user iku
+                    INNER JOIN data_karyawan dk ON dk.KaryawanNID = iku.KaryawanNID
+                    GROUP BY iku.KaryawanNID
+                    ORDER BY dk.Nama_Lengkap;";
+            $qry = mysqli_query($Connection, $sql);
+            $Karyawan_List = array();
+            while($buff = mysqli_fetch_array($qry))
+            {
+                $KaryawanNID = $buff['KaryawanNID'];
+                $NIM = $buff['NIM'];
+                $Nama_Lengkap = $buff['Nama_Lengkap'];
+
+                $sql2 = "SELECT AVG(lnc.Nilai) AS Nilai FROM laporan_non_cs lnc
+                            INNER JOIN indikator_kpi_user iku ON iku.Indikator_UserNID = lnc.Indikator_UserNID 
+                            INNER JOIN data_karyawan dk ON dk.KaryawanNID = iku.KaryawanNID
+                            WHERE iku.KaryawanNID = ".$KaryawanNID." AND LEFT(lnc.Periode,4) = '".$Tahun."' AND RIGHT(lnc.Periode,2) = '".$Bulan."'";
+                $qry2 = mysqli_query($Connection, $sql2);
+                $buff2 = mysqli_fetch_array($qry2);
+                $Nilai = ($buff2['Nilai'] !== null) ? $buff2['Nilai'] : 0;
+
+                $Karyawan_List[] = array('KaryawanNID' => $KaryawanNID, 'NIM' => $NIM, 'Nama_Lengkap' => $Nama_Lengkap, 'Nilai' => $Nilai);
+            }
+
+            // Sort by Nilai descending
+            usort($Karyawan_List, function($a, $b) {
+                return (float)$b['Nilai'] <=> (float)$a['Nilai'];
+            });
+
+            ?>
+            <!DOCTYPE html>
+            <html>
+                <head>
+                    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+                    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimal-ui">
+                    <title>SILA - Rekap KPI Non CS</title>
+                    <meta content="Rekap KPI Non CS" name="description" />
+                    <meta content="ThemeDesign" name="author" />
+
+                    <link rel="icon" type="image/png" sizes="32x32" href="assets/images/favicon/favicon-32x32.png">
+                    <link rel="icon" type="image/png" sizes="96x96" href="assets/images/favicon/favicon-96x96.png">
+                    <link rel="icon" type="image/png" sizes="16x16" href="assets/images/favicon/favicon-16x16.png">
+
+                    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/dt/dt-1.10.24/datatables.min.css"/>
+                    <link href="assets/css/bootstrap.min.css" rel="stylesheet" type="text/css">
+                    <link href="assets/css/icons.css" rel="stylesheet" type="text/css">
+                    <link href="assets/css/style.css" rel="stylesheet" type="text/css">
+                </head>
+                <body class="fixed-left">
+                    <div id="wrapper">
+                        <!-- Top Bar Start -->
+                        <div class="topbar">
+                            <div class="topbar-left">
+                                <a href="index.php" class="logo">SILA</a>
+                                <a href="index.php" class="logo-sm"><span>S</span></a>
+                            </div>
+                            <div class="navbar navbar-default" role="navigation">
+                                <div class="container">
+                                    <div class="">
+                                        <div class="pull-left">
+                                            <button type="button" class="button-menu-mobile open-left waves-effect waves-light">
+                                                <i class="ion-navicon"></i>
+                                            </button>
+                                            <span class="clearfix"></span>
+                                        </div>
+                                        <ul class="nav navbar-nav navbar-right pull-right">
+                                            <li class="hidden-xs">
+                                                <a href="#" id="btn-fullscreen" class="waves-effect waves-light notification-icon-box"><i class="ion-qr-scanner"></i></a>
+                                            </li>
+                                            <li class="dropdown">
+                                                <a href="" class="dropdown-toggle profile waves-effect waves-light" data-toggle="dropdown" aria-expanded="true">
+                                                    <img src="../files/profile_pictures/<?php echo $Profile_Pictures ?>" alt="user-img" class="img-circle">
+                                                    <span class="profile-username">
+                                                        <?php echo $Nama_Panggilan ?> <span class="caret"></span>
+                                                    </span>
+                                                </a>
+                                                <ul class="dropdown-menu">
+                                                    <li><a href="../logout.php"> Logout</a></li>
+                                                </ul>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Top Bar End -->
+
+                        <!-- Left Sidebar Start -->
+                        <div class="left side-menu">
+                            <div class="sidebar-inner slimscrollleft">
+                                <div class="user-details">
+                                    <div class="text-center">
+                                        <img src="../files/profile_pictures/<?php echo $Profile_Pictures ?>" alt="" class="img-circle">
+                                    </div>
+                                    <div class="user-info">
+                                        <div class="dropdown">
+                                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" aria-expanded="false"><?php echo $Nama_Panggilan ?> <span class="caret"></span></a>
+                                            <ul class="dropdown-menu">
+                                                <li><a href="../logout.php"> Logout</a></li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div id="sidebar-menu">
+                                    <ul>
+                                        <li>
+                                            <a href="index.php" class="waves-effect"><i class="ti-home"></i><span> Dashboard </span></a>
+                                        </li>
+                                        <li>
+                                            <a href="laporan_kpi_non_cs.php?Action=Approval_List" class="waves-effect"><i class="ti-back-left"></i><span> Kembali </span></a>
+                                        </li>
+                                    </ul>
+                                </div>
+                                <div class="clearfix"></div>
+                            </div>
+                        </div>
+                        <!-- Left Sidebar End -->
+
+                        <!-- Start right Content here -->
+                        <div class="content-page">
+                            <div class="content">
+                                <div class="">
+                                    <div class="page-header-title">
+                                        <h4 class="page-title">Rekap KPI Non CS - <?php echo $Daftar_Bulan[intval($Bulan)] . ' ' . $Tahun; ?></h4>
+                                    </div>
+                                </div>
+
+                                <div class="page-content-wrapper">
+                                    <div class="container">
+                                        <div class="row" style="margin-bottom:15px;">
+                                            <div class="col-md-12">
+                                                <a href="laporan_kpi_non_cs.php?Action=Download_Rekap_KPI&Tahun=<?php echo $Tahun; ?>&Bulan=<?php echo $Bulan; ?>" class="btn btn-success"><i class="fa fa-download"></i> Download XLSX</a>
+                                                <a href="laporan_kpi_non_cs.php?Action=Approval_List" class="btn btn-default"><i class="fa fa-arrow-left"></i> Kembali</a>
+                                            </div>
+                                        </div>
+                                        <div class="panel">
+                                            <div class="panel-body table-responsive">
+                                                <table id="data-rekap" class="display" style="width:100%">
+                                                    <thead>
+                                                        <tr>
+                                                            <th width="5%" style="text-align:center;vertical-align:middle">No</th>
+                                                            <th width="65%" style="text-align:left;vertical-align:middle">Nama Karyawan</th>
+                                                            <th width="30%" style="text-align:right;vertical-align:middle">Nilai</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <?php
+                                                        $Nomor_Urut = 1;
+                                                        foreach($Karyawan_List as $karyawan)
+                                                        {
+                                                            ?>
+                                                            <tr>
+                                                                <td style="text-align:center;font-size:12px"><?php echo $Nomor_Urut; ?></td>
+                                                                <td style="text-align:left;font-size:12px"><?php echo htmlspecialchars($karyawan['Nama_Lengkap']); ?></td>
+                                                                <td style="text-align:right;font-size:12px"><?php echo $karyawan['Nilai']; ?></td>
+                                                            </tr>
+                                                            <?php
+                                                            $Nomor_Urut++;
+                                                        }
+                                                        ?>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div> <!-- content -->
+                        </div>
+                        <!-- End Right content here -->
+                    </div>
+                    <!-- END wrapper -->
+
+                    <script src="assets/js/jquery.min.js"></script>
+                    <script src="assets/js/bootstrap.min.js"></script>
+                    <script src="assets/js/modernizr.min.js"></script>
+                    <script src="assets/js/detect.js"></script>
+                    <script src="assets/js/fastclick.js"></script>
+                    <script src="assets/js/jquery.slimscroll.js"></script>
+                    <script src="assets/js/jquery.blockUI.js"></script>
+                    <script src="assets/js/waves.js"></script>
+                    <script src="assets/js/wow.min.js"></script>
+                    <script src="assets/js/jquery.nicescroll.js"></script>
+                    <script src="assets/js/jquery.scrollTo.min.js"></script>
+
+                    <script type="text/javascript" src="https://cdn.datatables.net/v/dt/dt-1.10.24/datatables.min.js"></script>
+                    <script src="assets/pages/datatables.init.js"></script>
+                    <script src="assets/js/app.js"></script>
+                    <script>
+                        $(document).ready(function() {
+                            $('#data-rekap').DataTable({
+                                "ordering": false,
+                                "pageLength": 50,
+                            });
+                        });
+                    </script>
+                </body>
+            </html>
+            <?php
+        }
+        elseif($_GET['Action']=='Download_Rekap_KPI')
+        {
+            require_once('assets/vendor/autoload.php');
+
+            // Get filter values
+            $Tahun = isset($_GET['Tahun']) ? $_GET['Tahun'] : date('Y');
+            $Bulan = isset($_GET['Bulan']) ? str_pad($_GET['Bulan'], 2, '0', STR_PAD_LEFT) : date('m');
+
+            $sql="SELECT iku.KaryawanNID, dk.NIM, dk.Nama_Lengkap FROM indikator_kpi_user iku
+                    INNER JOIN data_karyawan dk ON dk.KaryawanNID = iku.KaryawanNID
+                    GROUP BY iku.KaryawanNID
+                    ORDER BY dk.Nama_Lengkap;";
+            $qry = mysqli_query($Connection, $sql);
+            $Karyawan_List = array();
+            while($buff = mysqli_fetch_array($qry))
+            {
+                $KaryawanNID = $buff['KaryawanNID'];
+                $NIM = $buff['NIM'];
+                $Nama_Lengkap = $buff['Nama_Lengkap'];
+
+                $sql2 = "SELECT AVG(lnc.Nilai) AS Nilai FROM laporan_non_cs lnc
+                            INNER JOIN indikator_kpi_user iku ON iku.Indikator_UserNID = lnc.Indikator_UserNID 
+                            INNER JOIN data_karyawan dk ON dk.KaryawanNID = iku.KaryawanNID
+                            WHERE iku.KaryawanNID = ".$KaryawanNID." AND LEFT(lnc.Periode,4) = '".$Tahun."' AND RIGHT(lnc.Periode,2) = '".$Bulan."'";
+                $qry2 = mysqli_query($Connection, $sql2);
+                $buff2 = mysqli_fetch_array($qry2);
+                $Nilai = ($buff2['Nilai'] !== null) ? $buff2['Nilai'] : 0;
+
+                $Karyawan_List[] = array('KaryawanNID' => $KaryawanNID, 'NIM' => $NIM, 'Nama_Lengkap' => $Nama_Lengkap, 'Nilai' => $Nilai);
+            }
+
+            // Sort by Nilai descending
+            usort($Karyawan_List, function($a, $b) {
+                return (float)$b['Nilai'] <=> (float)$a['Nilai'];
+            });
+
+            // Create spreadsheet
+            $spreadsheet = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
+            $sheet = $spreadsheet->getActiveSheet();
+            $sheet->setTitle('Rekap KPI Non CS');
+
+            // Title row
+            $sheet->setCellValue('A1', 'Rekap KPI Non CS - ' . $Daftar_Bulan[intval($Bulan)] . ' ' . $Tahun);
+            $sheet->mergeCells('A1:C1');
+            $sheet->getStyle('A1')->getFont()->setBold(true)->setSize(14);
+
+            // Header row
+            $sheet->setCellValue('A3', 'No');
+            $sheet->setCellValue('B3', 'Nama Karyawan');
+            $sheet->setCellValue('C3', 'Nilai');
+            $sheet->getStyle('A3:C3')->getFont()->setBold(true);
+            $sheet->getStyle('A3:C3')->getAlignment()->setHorizontal('center');
+
+            // Data rows
+            $Baris = 4;
+            $Nomor_Urut = 1;
+            foreach($Karyawan_List as $karyawan)
+            {
+                $sheet->setCellValue('A' . $Baris, $Nomor_Urut);
+                $sheet->setCellValue('B' . $Baris, $karyawan['Nama_Lengkap']);
+                $sheet->setCellValue('C' . $Baris, $karyawan['Nilai']);
+                $sheet->getStyle('A' . $Baris)->getAlignment()->setHorizontal('center');
+                $sheet->getStyle('C' . $Baris)->getAlignment()->setHorizontal('right');
+                $Baris++;
+                $Nomor_Urut++;
+            }
+
+            // Auto-size columns
+            $sheet->getColumnDimension('A')->setWidth(8);
+            $sheet->getColumnDimension('B')->setAutoSize(true);
+            $sheet->getColumnDimension('C')->setWidth(15);
+
+            // Add borders to data area
+            $lastRow = $Baris - 1;
+            if($lastRow >= 3)
+            {
+                $sheet->getStyle('A3:C' . $lastRow)->getBorders()->getAllBorders()->setBorderStyle('thin');
+            }
+
+            // Output file
+            $Nama_File = 'Rekap_KPI_Non_CS_' . $Tahun . '_' . $Bulan;
+            header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+            header('Content-Disposition: attachment;filename="' . $Nama_File . '.xlsx"');
+            header('Cache-Control: max-age=0');
+
+            $writer = \PhpOffice\PhpSpreadsheet\IOFactory::createWriter($spreadsheet, 'Xlsx');
+            $writer->save('php://output');
+            exit;
         }
         elseif($_GET['Action']=='Toggle_Check')
         {
@@ -1873,91 +2182,53 @@ else
                                                         <div class="form-group">
                                                             <label for="inputPeriode" class="col-sm-3 ">Periode</label>
                                                             
-                                                            <div class="col-sm-9 input-group date" >
+                                                            <div class="col-sm-9" >
                                                                 <?php
-                                                                
-
-                                                                
-                                                                //echo "Filter tanggal ".$Filter_Tanggal."<br>";
-                                                                $Tanggal = $Tanggal_Laporan;
-                                                                $Tanggal = date('Y-m-d');
-                                                                $Tanggal_Berjalan = date('Y-m-d');
-                                                                $Bulan_Berjalan = intval(date("m"));
                                                                 $Tahun_Berjalan = intval(date("Y"));
-                                                                //echo "Bulan berjalan : ".$Bulan_Berjalan."<br>";
-                                                                //echo "Tahun berjalan : ".$Tahun_Berjalan."<br>";
-                                                                if($Bulan_Berjalan==1)
-                                                                {
-                                                                    $Tahun_Sebelumnya = $Tahun_Berjalan - 1;
-                                                                    $Bulan_Sebelumnya = 12;
-                                                                }
-                                                                else
-                                                                {
-                                                                    $Tahun_Sebelumnya = $Tahun_Berjalan;
-                                                                    $Bulan_Sebelumnya = $Bulan_Berjalan - 1;
-                                                                }
-                                                                $Bulan_Text_Sebelumnya = $Daftar_Bulan[$Bulan_Sebelumnya];
-                                                                $Text_Item_Sebelumnya = $Bulan_Text_Sebelumnya." ".$Tahun_Sebelumnya;
-                                                                $Waktu_Sebelumnya = $Tahun_Sebelumnya."-".substr("0".$Bulan_Sebelumnya,-2);
-                                                                $Bulan_Text = $Daftar_Bulan[intval(substr($Tanggal,5,2))];
-                                                                $Tahun_Text = substr($Tanggal,0,4);
-                                                                //echo $Text_Item_Sebelumnya."<br>";
-                                                                $Text_Item_Bulan_Berjalan = $Daftar_Bulan[$Bulan_Berjalan]." ".$Tahun_Text;
-                                                                //$Text_Item = date("Y")." ".date("m");
-                                                                //echo $Text_Item;
-                                                                $sql = "SELECT * FROM laporan_non_cs lh 
-                                                                            WHERE lh.Periode <> '".$Tahun_Berjalan."-".date("m")."'
-                                                                            GROUP BY lh.Periode
-                                                                            ";
-                                                                //echo $sql.";<br>";
-                                                                $Tanggal = date('Y-m-d');
-                                                                $Tanggal_Berjalan = date('Y-m-d');
                                                                 $Bulan_Berjalan = intval(date("m"));
-                                                                $Tahun_Berjalan = intval(date("Y"));
-                                                                //echo "Bulan berjalan : ".$Bulan_Berjalan."<br>";
-                                                                //echo "Tahun berjalan : ".$Tahun_Berjalan."<br>";
-                                                                if($Bulan_Berjalan==1)
-                                                                {
-                                                                    $Tahun_Sebelumnya = $Tahun_Berjalan - 1;
-                                                                    $Bulan_Sebelumnya = 12;
-                                                                }
-                                                                else
-                                                                {
-                                                                    $Tahun_Sebelumnya = $Tahun_Berjalan;
-                                                                    $Bulan_Sebelumnya = $Bulan_Berjalan - 1;
-                                                                }
-                                                                //echo "Tahun_Sebelumnya : ".$Tahun_Sebelumnya."<br>";
-                                                                //echo "Bulan_Sebelumnya : ".$Bulan_Sebelumnya."<br>";
-                                                                $Bulan_Text_Sebelumnya = $Daftar_Bulan[$Bulan_Sebelumnya];
-                                                                $Text_Item_Sebelumnya = $Bulan_Text_Sebelumnya." ".$Tahun_Sebelumnya;
-                                                                $Waktu_Sebelumnya = $Tahun_Sebelumnya."-".substr("0".$Bulan_Sebelumnya,-2);
-                                                                $Bulan_Text = $Daftar_Bulan[intval(substr($Tanggal,5,2))];
-                                                                $Tahun_Text = substr($Tanggal,0,4);
-                                                                $Text_Item = $Bulan_Text." ".$Tahun_Text;
-                                                                $Waktu = $Tahun_Text."-".substr($Tanggal,5,2);
-                                                                //echo "Bulan_Text_Sebelumnya : ".$Bulan_Text_Sebelumnya."<br>";
-                                                                //echo "Text_Item_Sebelumnya : ".$Text_Item_Sebelumnya."<br>";
-                                                                //echo "Waktu_Sebelumnya : ".$Waktu_Sebelumnya."<br>";
-                                                                //echo "Waktu : ".$Waktu."<br>";
-                                                                //echo "Bulan_Text : ".$Bulan_Text."<br>";
-                                                                //echo "Tahun_Text : ".$Tahun_Text."<br>";
-                                                                //echo "Text_Item : ".$Text_Item."<br>";
                                                                 
-                                                                // Set default periode untuk tambah data baru
+                                                                // Set default values
                                                                 if($Action == "Dokumen_Tambah")
                                                                 {
-                                                                    $Periode_Default = $Waktu; // Bulan dan tahun berjalan
+                                                                    $Periode_Tahun_Default = $Tahun_Berjalan;
+                                                                    $Periode_Bulan_Default = str_pad($Bulan_Berjalan, 2, '0', STR_PAD_LEFT);
                                                                 }
                                                                 else
                                                                 {
-                                                                    $Periode_Default = $Periode; // Dari database untuk update
+                                                                    // Dari database untuk update (Periode format: YYYY-MM)
+                                                                    $Periode_Tahun_Default = intval(substr($Periode, 0, 4));
+                                                                    $Periode_Bulan_Default = substr($Periode, 5, 2);
                                                                 }
                                                                 ?>
-                                                               <select name="Periode" id="inputWaktu" onchange="CekWaktu()" class="form-control">
-                                                                    
-                                                                    <option value="<?php echo $Waktu_Sebelumnya?>" <?php echo ($Periode_Default == $Waktu_Sebelumnya) ? 'selected' : ''; ?>><?php echo $Text_Item_Sebelumnya ?></option>
-                                                                    <option value="<?php echo $Waktu?>" <?php echo ($Periode_Default == $Waktu) ? 'selected' : ''; ?>><?php echo $Text_Item ?></option>
-                                                                </select>
+                                                                <input type="hidden" name="Periode" id="inputPeriodeHidden" value="<?php echo $Periode_Tahun_Default.'-'.$Periode_Bulan_Default; ?>">
+                                                                <div class="row">
+                                                                    <div class="col-sm-6">
+                                                                        <label>Tahun</label>
+                                                                        <select id="inputPeriodeTahun" class="form-control" onchange="updatePeriode()">
+                                                                            <?php
+                                                                            $tahun_options = array($Tahun_Berjalan - 1, $Tahun_Berjalan, $Tahun_Berjalan + 1);
+                                                                            foreach($tahun_options as $thn)
+                                                                            {
+                                                                                $selected = ($thn == $Periode_Tahun_Default) ? 'selected' : '';
+                                                                                echo '<option value="'.$thn.'" '.$selected.'>'.$thn.'</option>';
+                                                                            }
+                                                                            ?>
+                                                                        </select>
+                                                                    </div>
+                                                                    <div class="col-sm-6">
+                                                                        <label>Bulan</label>
+                                                                        <select id="inputPeriodeBulan" class="form-control" onchange="updatePeriode()">
+                                                                            <?php
+                                                                            for($i = 1; $i <= 12; $i++)
+                                                                            {
+                                                                                $bulan_val = str_pad($i, 2, '0', STR_PAD_LEFT);
+                                                                                $selected = ($bulan_val == $Periode_Bulan_Default) ? 'selected' : '';
+                                                                                echo '<option value="'.$bulan_val.'" '.$selected.'>'.$Daftar_Bulan[$i].'</option>';
+                                                                            }
+                                                                            ?>
+                                                                        </select>
+                                                                    </div>
+                                                                </div>
                                                             </div>
                                                         </div>
                                                         <div class="form-group">
@@ -2157,6 +2428,12 @@ else
 
                     </script>
                     <script>
+                        function updatePeriode() {
+                            var tahun = document.getElementById('inputPeriodeTahun').value;
+                            var bulan = document.getElementById('inputPeriodeBulan').value;
+                            document.getElementById('inputPeriodeHidden').value = tahun + '-' + bulan;
+                        }
+
                         $(document).ready(function() {
                             $('#data-kehadiran').DataTable( {
                                 "ordering": false,
@@ -2216,6 +2493,8 @@ else
                             
                             // Validate files before submit
                             $('form[name="form_tambah"]').submit(function(e) {
+                                // Update Periode hidden field before submit
+                                updatePeriode();
                                 var hasError = false;
                                 var errorMessages = [];
                                 
@@ -2578,8 +2857,8 @@ else
                         //echo "Tanggal Submit: ".$Tanggal_Submit."<br>";
                         if($Tanggal_Submit > $Tanggal_Akhir_Bulan)
                         {
-                            $Simpan = False;
-                            echo "Validasi Gagal: Tanggal submit melebihi akhir bulan periode!<br>";
+                            //$Simpan = False;
+                            //echo "Validasi Gagal: Tanggal submit melebihi akhir bulan periode!<br>";
                         }
                     }
 
